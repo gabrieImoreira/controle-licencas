@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from models.user import UserModel
 
 users = [
     {
@@ -42,13 +43,15 @@ class User(Resource):
 
     def post(self, id):
         data = User.attr.parse_args()
-        new_user = {'id': id, **data}
+        user_object = UserModel(id, **data)
+        new_user = user_object.json()
         users.append(new_user)
         return new_user, 201
 
     def put(self, id):
         data = User.attr.parse_args()
-        edit_user = {'id': id, **data}
+        user_object = UserModel(id, **data)
+        edit_user = user_object.json()
         user = User.find_user(id)
         if user:
             user.update(edit_user)

@@ -1,65 +1,50 @@
 from flask_restful import Resource, reqparse
 from models.user import UserModel
 
-users = [
-    {
-        'id': 0,
-        'email': 'gantonio155@gmail.com',
-        'expiration_date': '30/09/2022'
-    },
-    {
-        'id': 1,
-        'email': 'fabio@outlook.com',
-        'expiration_date': '12/06/2022'
-    },
-    {
-        'id': 2,
-        'email': 'maria@gmail.com',
-        'expiration_date': '14/01/2023'
-    }
-]
-
 class Users(Resource):
     def get(self):
-        return {'users': users}
+        return {'users': [user.json() for user in UserModel.query.all()]}
 
 class User(Resource):
     attr = reqparse.RequestParser()
-    attr.add_argument('email')
-    attr.add_argument('expiration_date')
-
-    def find_user(id):
-        for user in users:
-            if user['id'] == id:
-                return user
-        return False
-
+    attr.add_argument('email', type=str, required=True, help="The field 'email' cannot be left blank.")
+    attr.add_argument('expiration_date', type=str, required=True, help="The field 'expiration_date' cannot be left blank.")
     def get(self, id):
-        user = User.find_user(id)
-        print(user)
+        user = UserModel.find_user(id)
         if user:
-            return user
+            return user.json()
         return {'message': 'User not found.'}, 404
 
     def post(self, id):
+        if UserModel.find_user(id):
+            return {'message': 'User already exists.'}, 400
         data = User.attr.parse_args()
-        user_object = UserModel(id, **data)
-        new_user = user_object.json()
-        users.append(new_user)
-        return new_user, 201
+        user = UserModel(id, **data)
+        try:
+            user.save_user()
+        except:
+            return {'message': 'An internal error ocurred trying to save user.'}, 500
+        return user.json()
 
     def put(self, id):
         data = User.attr.parse_args()
-        user_object = UserModel(id, **data)
-        edit_user = user_object.json()
-        user = User.find_user(id)
+        user = UserModel.find_user(id)
         if user:
-            user.update(edit_user)
-            return user, 200
+            user.update_user(**data)
+            try:
+                user.save_user()
+            except:
+                return {'message': 'An internal error ocurred trying to save user.'}, 500
+            return user.json(), 200
         return {'message': 'User not found.'}, 404
     
     def delete(self, id):
-        global users
-        users = [user for user in users if user['id'] != id]
-        return {'message': 'User deleted.'}
-
+        user = UserModel.find_user(id)
+        if user:
+            try:
+                user.save_user()
+            except:
+                return {'message': 'An internal error ocurred trying to delete user.'}, 500
+            user.delete_user()
+            return {'message': 'User deleted.'}
+        return {'message': 'User not found.'}, 404

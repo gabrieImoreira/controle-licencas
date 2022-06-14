@@ -5,6 +5,15 @@ class Users(Resource):
     def get(self):
         return {'users': [user.json() for user in UserModel.query.all()]}
 
+    def post(self):
+        data = User.attr.parse_args()
+        user = UserModel(**data)
+        try:
+            user.save_user()
+        except:
+            return {'message': 'An internal error ocurred trying to save user.'}, 500
+        return user.json()
+
 class User(Resource):
     attr = reqparse.RequestParser()
     attr.add_argument('email', type=str, required=True, help="The field 'email' cannot be left blank.")
@@ -14,17 +23,6 @@ class User(Resource):
         if user:
             return user.json()
         return {'message': 'User not found.'}, 404
-
-    def post(self, id):
-        if UserModel.find_user(id):
-            return {'message': 'User already exists.'}, 400
-        data = User.attr.parse_args()
-        user = UserModel(id, **data)
-        try:
-            user.save_user()
-        except:
-            return {'message': 'An internal error ocurred trying to save user.'}, 500
-        return user.json()
 
     def put(self, id):
         data = User.attr.parse_args()

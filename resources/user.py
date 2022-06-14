@@ -30,11 +30,11 @@ class User(Resource):
 
     def put(self, id):
         data = User.attr.parse_args()
-        user_validator = UserModel.check_email(data['email'])
-        if user_validator.get_id() != id:
-            return {'message': 'Email already exists in another register.'}, 400
         user = UserModel.find_user(id)
         if user:
+            user = UserModel.check_email(data['email'])
+            if user.get_id() != id:
+                return {'message': 'Email already exists in another register.'}, 400
             user.update_user(**data)
             try:
                 user.save_user()

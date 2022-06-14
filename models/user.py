@@ -32,7 +32,7 @@ class UserModel(db.Model):
         user = cls.query.filter_by(email=email).first()
         if user:
             return user
-        return False
+        return None
 
     def get_id(self):
         return self.id

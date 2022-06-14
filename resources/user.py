@@ -7,6 +7,9 @@ class Users(Resource):
 
     def post(self):
         data = User.attr.parse_args()
+        email_exists = UserModel.check_email(data['email'])
+        if email_exists:
+            return {'message': 'Email already exists.'}, 500
         user = UserModel(**data)
         try:
             user.save_user()
@@ -18,6 +21,7 @@ class User(Resource):
     attr = reqparse.RequestParser()
     attr.add_argument('email', type=str, required=True, help="The field 'email' cannot be left blank.")
     attr.add_argument('expiration_date', type=str, required=True, help="The field 'expiration_date' cannot be left blank.")
+    
     def get(self, id):
         user = UserModel.find_user(id)
         if user:
@@ -26,6 +30,9 @@ class User(Resource):
 
     def put(self, id):
         data = User.attr.parse_args()
+        user_validator = UserModel.check_email(data['email'])
+        if user_validator.get_id() != id:
+            return {'message': 'Email already exists in another register.'}, 400
         user = UserModel.find_user(id)
         if user:
             user.update_user(**data)

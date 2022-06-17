@@ -1,5 +1,8 @@
 from flask_restful import Resource, reqparse
+from flask_jwt_extended import create_access_token
 from models.admin import AdminModel
+from safe_cmp import safe_cmp
+
 
 class Admin(Resource):
     # admin/{id}
@@ -22,13 +25,13 @@ class Admin(Resource):
 
 class AdminRegister(Resource):
     # /register
+    attr = reqparse.RequestParser()
+    attr.add_argument('login', type=str, required=True, help="The field 'login' cannot be left blank.")
+    attr.add_argument('password', type=str, required=True, help="The field 'password' cannot be left blank.")
     
     def post(self):
-        attr = reqparse.RequestParser()
-        attr.add_argument('login', type=str, required=True, help="The field 'login' cannot be left blank.")
-        attr.add_argument('password', type=str, required=True, help="The field 'password' cannot be left blank.")
-        attr.add_argument('authorization', type=str, required=True, help="The field 'authorization' cannot be left blank.")
-        data = attr.parse_args()
+        self.attr.add_argument('authorization', type=str, required=True, help="The field 'authorization' cannot be left blank.")
+        data = self.attr.parse_args()
 
         if AdminModel.find_by_login(data['login']):
             return {"message": "The login '{}' already exists.".format(data['login'])}
@@ -36,3 +39,14 @@ class AdminRegister(Resource):
         admin = AdminModel(**data)
         admin.save_admin()
         return {'message': 'User created successfully'}, 201
+
+class AdminLogin(Resource):
+
+    @classmethod
+    def post(cls):
+        data = AdminRegister.attr.parse_args()
+        admin = AdminModel.find_by_login(data['login'])
+        if admin and safe_cmp(admin.password, data['password']) == 0:
+            access_token = create_access_token(identity=admin.id)
+            return {'access_token': access_token}, 200
+        return {'message': 'The username or password is incorrect.'}, 401

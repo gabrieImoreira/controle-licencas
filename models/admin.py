@@ -7,7 +7,7 @@ class AdminModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(320), unique=True)
     password = db.Column(db.String(40))
-    authorization = db.Column(db.String(40))
+    authorization = db.Column(db.Integer)
 
 
     def __init__(self, login, password, authorization):
@@ -28,6 +28,13 @@ class AdminModel(db.Model):
             return admin
         return None
     
+    @classmethod
+    def find_by_login(cls, login):
+        admin = cls.query.filter_by(login=login).first()
+        if admin:
+            return admin
+        return None
+
     def save_admin(self):
         db.session.add(self)
         db.session.commit()
@@ -41,6 +48,6 @@ class AdminModel(db.Model):
         db.session.commit()
     
     def return_permission(self, authorization):
-        if authorization == 'HIGH':
+        if authorization == 3:
             return True
         return False

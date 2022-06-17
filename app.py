@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_restful import Api
+from resources.admin import Admin, AdminRegister
 from resources.user import User, Users
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -13,6 +15,8 @@ def create_db():
 
 api.add_resource(Users, '/users')
 api.add_resource(User, '/users/<int:id>')
+api.add_resource(Admin, '/admin/<int:id>')
+api.add_resource(AdminRegister, '/register')
 
 
 if __name__ == '__main__':

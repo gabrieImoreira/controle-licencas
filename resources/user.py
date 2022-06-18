@@ -1,15 +1,22 @@
+from ast import expr_context
+from datetime import datetime
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
+from sqlalchemy import DATE
 from models.user import UserModel
 
 class Users(Resource):
-    @jwt_required()
+    #@jwt_required()
     def get(self):
         return {'users': [user.json() for user in UserModel.query.all()]}
 
-    @jwt_required()
+    #@jwt_required()
     def post(self):
         data = User.attr.parse_args()
+        try:
+            data['expiration_date'] = datetime.strptime(data['expiration_date'], '%Y-%m-%d')
+        except:
+            return {'message': 'Invalid date.'}, 404
         email_exists = UserModel.check_email(data['email'])
         if email_exists:
             return {'message': 'Email already exists.'}, 500
@@ -25,16 +32,20 @@ class User(Resource):
     attr.add_argument('email', type=str, required=True, help="The field 'email' cannot be left blank.")
     attr.add_argument('expiration_date', type=str, required=True, help="The field 'expiration_date' cannot be left blank.")
     
-    @jwt_required()
+    # @jwt_required()
     def get(self, id):
         user = UserModel.find_user(id)
         if user:
             return user.json()
         return {'message': 'User not found.'}, 404
 
-    @jwt_required()
+    # @jwt_required()
     def put(self, id):
         data = User.attr.parse_args()
+        try:
+            data['expiration_date'] = datetime.strptime(data['expiration_date'], '%Y-%m-%d')
+        except:
+            return {'message': 'Invalid date.'}, 404
         user = UserModel.find_user(id)
         if user:
             user = UserModel.check_email(data['email'])
@@ -48,7 +59,7 @@ class User(Resource):
             return user.json(), 200
         return {'message': 'User not found.'}, 404
     
-    @jwt_required()
+    # @jwt_required()
     def delete(self, id):
         user = UserModel.find_user(id)
         if user:

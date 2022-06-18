@@ -7,14 +7,14 @@ from safe_cmp import safe_cmp
 
 class Admin(Resource):
     # admin/{id}
-    @jwt_required()
+    # @jwt_required()
     def get(self, id):
         admin = AdminModel.find_admin(id)
         if admin:
             return admin.json()
         return {'message': 'Admin not found.'}, 404
     
-    @jwt_required()
+    # @jwt_required()
     def delete(self, id):
         admin = AdminModel.find_admin(id)
         if admin:
@@ -32,7 +32,7 @@ class AdminRegister(Resource):
     attr.add_argument('login', type=str, required=True, help="The field 'login' cannot be left blank.")
     attr.add_argument('password', type=str, required=True, help="The field 'password' cannot be left blank.")
     
-    @jwt_required()
+    # @jwt_required()
     def post(self):
         self.attr.add_argument('authorization', type=str, required=True, help="The field 'authorization' cannot be left blank.")
         data = self.attr.parse_args()
@@ -57,7 +57,7 @@ class AdminLogin(Resource):
 
 class AdminLogout(Resource):
 
-    @jwt_required()
+    # @jwt_required()
     def post(self):
         jwt_id = get_jwt()['jti'] # JWT Token Identifier
         BLACKLIST.add(jwt_id)

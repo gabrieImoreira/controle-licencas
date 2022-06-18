@@ -6,7 +6,7 @@ class UserModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(320), unique=True)
-    expiration_date = db.Column(db.String(10))
+    expiration_date = db.Column(db.DateTime)
 
 
     def __init__(self, email, expiration_date):
@@ -17,7 +17,7 @@ class UserModel(db.Model):
         return {
             'id': self.id,
             'email': self.email,
-            'expiration_date': self.expiration_date
+            'expiration_date': self.expiration_date.strftime('%Y-%m-%d')
         }
 
     @classmethod

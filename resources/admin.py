@@ -1,17 +1,20 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 from models.admin import AdminModel
+from blacklist import BLACKLIST
 from safe_cmp import safe_cmp
 
 
 class Admin(Resource):
     # admin/{id}
+    @jwt_required()
     def get(self, id):
         admin = AdminModel.find_admin(id)
         if admin:
             return admin.json()
         return {'message': 'Admin not found.'}, 404
     
+    @jwt_required()
     def delete(self, id):
         admin = AdminModel.find_admin(id)
         if admin:
@@ -29,6 +32,7 @@ class AdminRegister(Resource):
     attr.add_argument('login', type=str, required=True, help="The field 'login' cannot be left blank.")
     attr.add_argument('password', type=str, required=True, help="The field 'password' cannot be left blank.")
     
+    @jwt_required()
     def post(self):
         self.attr.add_argument('authorization', type=str, required=True, help="The field 'authorization' cannot be left blank.")
         data = self.attr.parse_args()
@@ -50,3 +54,11 @@ class AdminLogin(Resource):
             access_token = create_access_token(identity=admin.id)
             return {'access_token': access_token}, 200
         return {'message': 'The username or password is incorrect.'}, 401
+
+class AdminLogout(Resource):
+
+    @jwt_required()
+    def post(self):
+        jwt_id = get_jwt()['jti'] # JWT Token Identifier
+        BLACKLIST.add(jwt_id)
+        return {'message': 'Logged out successfully!'}, 200

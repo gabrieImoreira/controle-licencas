@@ -1,14 +1,62 @@
-from ast import expr_context
 from datetime import datetime
+import sqlite3
+from flask import request
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource, reqparse
-from sqlalchemy import DATE
 from models.user import UserModel
 
+# /users?email=gabriel.moreira@google.com&initial_date=2022-06-01&final_date=2022-12-31
+def normalize_path_params(email=None,
+                        initial_date='01-01-1900',
+                        final_date='3000-01-01',
+                        limit = 50,
+                        offset = 0, **data):
+    if email:
+        return { 
+            'email': email,
+            'initial_date': initial_date,
+            'final_date': final_date,
+            'limit': limit,
+            'offset': offset
+        }
+    return { 
+            'initial_date': initial_date,
+            'final_date': final_date,
+            'limit': limit,
+            'offset': offset
+        }
+
 class Users(Resource):
-    #@jwt_required()
+    # @jwt_required()
     def get(self):
-        return {'users': [user.json() for user in UserModel.query.all()]}
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+
+        data = request.args
+        params = normalize_path_params(**data)
+
+        if not params.get('email'):
+            query = "SELECT * from users WHERE \
+                (expiration_date >= ? and expiration_date <= ?) \
+                    LIMIT ? OFFSET ?"
+            tupla = tuple(params[key] for key in params)
+            result = cursor.execute(query, tupla)
+        else: 
+            query = "SELECT * from users WHERE email = ? and \
+                (expiration_date >= ? and expiration_date <= ?) \
+                    LIMIT ? OFFSET ?"
+            tupla = tuple(params[key] for key in params)
+            result = cursor.execute(query, tupla)
+        
+        users = []
+        for line in result:
+            print(line)
+            users.append({
+                'id': line[0],
+                'email': line[1],
+                'expiration_date': line[2]
+            })
+        return {'users': users}
 
     #@jwt_required()
     def post(self):
@@ -48,8 +96,8 @@ class User(Resource):
             return {'message': 'Invalid date.'}, 404
         user = UserModel.find_user(id)
         if user:
-            user = UserModel.check_email(data['email'])
-            if user.get_id() != id:
+            user_check = UserModel.check_email(data['email'])
+            if user_check is not None and user_check.get_id() != id:
                 return {'message': 'Email already exists in another register.'}, 400
             user.update_user(**data)
             try:

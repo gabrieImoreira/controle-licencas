@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from blacklist import BLACKLIST
 from resources.admin import Admin, AdminRegister, AdminLogin, AdminLogout
+from resources.auth import Auth
 from resources.user import User, Users
 from flask_jwt_extended import JWTManager
 
@@ -31,6 +32,7 @@ api.add_resource(Admin, '/admin/<int:id>')
 api.add_resource(AdminRegister, '/register')
 api.add_resource(AdminLogin, '/login')
 api.add_resource(AdminLogout, '/logout')
+api.add_resource(Auth, '/auth')
 
 if __name__ == '__main__':
     from sql_alchemy import db

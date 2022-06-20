@@ -50,11 +50,10 @@ class Users(Resource):
         
         users = []
         for line in result:
-            print(line)
             users.append({
                 'id': line[0],
                 'email': line[1],
-                'expiration_date': line[2]
+                'expiration_date': (line[2])[:10]
             })
         return {'users': users}
 

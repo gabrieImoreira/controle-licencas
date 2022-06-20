@@ -57,7 +57,7 @@ class AdminLogin(Resource):
 
 class AdminLogout(Resource):
 
-    # @jwt_required()
+    @jwt_required()
     def post(self):
         jwt_id = get_jwt()['jti'] # JWT Token Identifier
         BLACKLIST.add(jwt_id)

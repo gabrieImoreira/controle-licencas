@@ -3,9 +3,11 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 from models.admin import AdminModel
 from blacklist import BLACKLIST
 from safe_cmp import safe_cmp
+from passlib.hash import bcrypt
 
 
 class Admin(Resource):
+    hasher = bcrypt.using(rounds=13)
     # admin/{id}
     # @jwt_required()
     def get(self, id):
@@ -34,23 +36,24 @@ class AdminRegister(Resource):
     
     # @jwt_required()
     def post(self):
-        self.attr.add_argument('authorization', type=str, required=True, help="The field 'authorization' cannot be left blank.")
+        self.attr.add_argument('authorization', type=str, required=False, help="The field 'authorization' cannot be left blank.")
         data = self.attr.parse_args()
 
         if AdminModel.find_by_login(data['login']):
             return {"message": "The login '{}' already exists.".format(data['login'])}
         
+        data['password'] = Admin.hasher.hash(data['password'])
         admin = AdminModel(**data)
         admin.save_admin()
         return {'message': 'User created successfully'}, 201
 
 class AdminLogin(Resource):
-
+    #login
     @classmethod
     def post(cls):
         data = AdminRegister.attr.parse_args()
         admin = AdminModel.find_by_login(data['login'])
-        if admin and safe_cmp(admin.password, data['password']) == 0:
+        if admin and Admin.hasher.verify(data['password'] ,admin.password) == 1:
             access_token = create_access_token(identity=admin.id)
             return {'access_token': access_token}, 200
         return {'message': 'The username or password is incorrect.'}, 401

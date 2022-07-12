@@ -27,7 +27,7 @@ class AdminModel(db.Model):
         if admin:
             return admin
         return None
-    
+      
     @classmethod
     def find_by_login(cls, login):
         admin = cls.query.filter_by(login=login).first()

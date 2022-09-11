@@ -26,6 +26,10 @@ def normalize_path_params(email=None,
             'offset': offset
         }
 
+class Inicial(Resource):
+    def get(self):
+        return 'API Titanium.'
+
 class Users(Resource):
     # @jwt_required()
     def get(self):

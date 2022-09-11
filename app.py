@@ -1,9 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_restful import Api
 from blacklist import BLACKLIST
 from resources.admin import Admin, AdminRegister, AdminLogin, AdminLogout
 from resources.auth import Auth
-from resources.user import User, Users
+from resources.user import User, Users, Inicial
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
@@ -13,6 +13,10 @@ app.config['JWT_SECRET_KEY'] = 'DontTellAnyone'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 api = Api(app)
 jwt = JWTManager(app)
+
+# @app.route('/login')
+# def login():
+#     return render_template('login.html')
 
 @app.before_first_request
 def create_db():
@@ -25,7 +29,7 @@ def verify_blacklist(self, token):
 @jwt.revoked_token_loader
 def access_token_invalidated(jwt_header, jwt_payload):
     return jsonify({'message': 'You have been logged out.'}), 401
-
+api.add_resource(Inicial, '/')
 api.add_resource(Users, '/users')
 api.add_resource(User, '/users/<int:id>')
 api.add_resource(Admin, '/admin/<int:id>')
@@ -37,4 +41,4 @@ api.add_resource(Auth, '/auth')
 if __name__ == '__main__':
     from sql_alchemy import db
     db.init_app(app)
-    app.run(debug=True)
+    app.run(host='192.168.0.21', port=3000)

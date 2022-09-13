@@ -1,0 +1,93 @@
+import React from "react";
+import axios from "axios";
+
+// axios.defaults.withCredentials = true;
+class App extends React.Component {
+
+
+constructor(props){
+    super(props);
+    this.state=
+    {
+        users:[],
+        email: '',
+        expiration_date: '',
+        id: 0
+    }
+}
+
+componentDidMount(){
+    axios.get("http://192.168.0.21:5000/users")
+    .then((res) => 
+    this.setState({ 
+        users: res.data.users,
+        email: '',
+        expiration_date: '',
+        id: 0
+    }, () => {
+        console.log(this.state.users);})
+    )
+}
+
+render(){
+  return (
+    <div className="container mt-5">
+        <div className="row mt-5">
+            <div className="col lg-6 mt-5">
+                <form onSubmit={(e)=>{this.submit(e)}}>
+                    <div className="form-group">
+                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder=""/>
+                    </div>
+                    <div className="form-group">
+                        <input type="date" onChange={(e)=>{this.datechange(e)}}className="form-control mt-2" placeholder=""/>
+                    </div>
+                    <button className="btn btn-block btn-primary mt-2">Enviar</button>
+                </form>
+            </div>
+            <div className="col lg-6 mt-5">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>E-mail</th>
+                            <th>Data de expiração</th>
+                            <th>Editar</th>
+                            <th>Deletar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+
+                        {this.state.users.map(user=>
+                        <tr>
+                            <td>{user.email}</td>
+                            <td>{user.expiration_date}</td>
+                            <td>
+                                <button className="btn btn-sm btn-primary">
+                                    <i className="fa fa-pencil"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button className="btn btn-sm btn-danger">
+                                    <i className="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                            
+                        )}
+                        
+
+
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+  );
+}
+}
+
+export default App;

@@ -5,8 +5,10 @@ from resources.admin import Admin, AdminRegister, AdminLogin, AdminLogout
 from resources.auth import Auth
 from resources.user import User, Users, Inicial
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'DontTellAnyone'
@@ -41,4 +43,4 @@ api.add_resource(Auth, '/auth')
 if __name__ == '__main__':
     from sql_alchemy import db
     db.init_app(app)
-    app.run(host='192.168.0.21', port=3000)
+    app.run(host='192.168.0.21', port=5000)

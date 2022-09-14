@@ -55,7 +55,6 @@ submit(event,id){
     
     event.preventDefault()
 if(id===0){
-    console.log('sate', this.expiration_date, params)
     axios.post('http://192.168.0.21:5000/users', 
     {
         "email": this.state.email, 
@@ -69,7 +68,12 @@ if(id===0){
     });
 }
 }
-
+delete(id){
+    axios.delete(`http://192.168.0.21:5000/users/${id}`)
+    .then(()=>{
+        this.componentDidMount()
+    })
+}
 render(){
   return (
     <div className="container mt-5">
@@ -77,10 +81,10 @@ render(){
             <div className="col lg-6 mt-5">
                 <form onSubmit={(e)=>{this.submit(e,this.state.id)}}>
                     <div className="form-group">
-                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder=""/>
+                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder={this.state.email} />
                     </div>
                     <div className="form-group">
-                        <input type="date" onChange={(e)=>{this.datechange(e)}}className="form-control mt-2" placeholder=""/>
+                        <input type="date" onChange={(e)=>{this.datechange(e)}}className="form-control mt-2" placeholder={this.state.expiration_date}/>
                     </div>
                     <button className="btn btn-block btn-primary mt-2">Submit</button>
                 </form>
@@ -109,7 +113,7 @@ render(){
                                 </button>
                             </td>
                             <td>
-                                <button className="btn btn-sm btn-danger">
+                                <button onClick={(e)=>this.delete(user.id)} className="btn btn-sm btn-danger">
                                     <i className="fa fa-trash"></i>
                                 </button>
                             </td>

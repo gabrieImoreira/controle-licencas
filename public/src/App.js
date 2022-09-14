@@ -68,12 +68,25 @@ if(id===0){
     });
 }
 }
+
 delete(id){
     axios.delete(`http://192.168.0.21:5000/users/${id}`)
     .then(()=>{
         this.componentDidMount()
     })
 }
+
+getone(id){
+    axios.get(`http://192.168.0.21:5000/users/${id}`)
+    .then((res)=>{
+        console.log(res.data)
+        this.setState({
+            email:res.data.email,
+            expiration_date:res.data.expiration_date
+        })
+    })
+}
+
 render(){
   return (
     <div className="container mt-5">
@@ -81,12 +94,12 @@ render(){
             <div className="col lg-6 mt-5">
                 <form onSubmit={(e)=>{this.submit(e,this.state.id)}}>
                     <div className="form-group">
-                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder={this.state.email} />
+                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder="E-mail" value={this.state.email} />
                     </div>
                     <div className="form-group">
-                        <input type="date" onChange={(e)=>{this.datechange(e)}}className="form-control mt-2" placeholder={this.state.expiration_date}/>
+                        <input type="date" onChange={(e)=>{this.datechange(e)}}className="form-control mt-2" placeholder="Data de expiração" value={this.state.expiration_date}/>
                     </div>
-                    <button className="btn btn-block btn-primary mt-2">Submit</button>
+                    <button className="btn btn-block btn-primary mt-2">Enviar</button>
                 </form>
             </div>
             <div className="col lg-6 mt-5">
@@ -108,7 +121,7 @@ render(){
                             <td>{user.email}</td>
                             <td>{user.expiration_date}</td>
                             <td>
-                                <button className="btn btn-sm btn-primary">
+                                <button onClick={(e)=>this.getone(user.id)} className="btn btn-sm btn-primary">
                                     <i className="fa fa-pencil"></i>
                                 </button>
                             </td>

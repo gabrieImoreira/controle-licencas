@@ -42,20 +42,29 @@ datechange = event =>{
 }
 
 submit(event,id){
+    console.log('id', id)
     const headers = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin":"*",
         "Access-Control-Allow-Headers":"*"
-      };
-    console.log('before', this.expiration_date)
-    const params = {
-        "email": "gugucastro56@gmail.com", 
-        "expiration_date": "2022-03-12"
-    }
-    
+      }
     event.preventDefault()
 if(id===0){
+    console.log('entrou no if', id)
     axios.post('http://192.168.0.21:5000/users', 
+    {
+        "email": this.state.email, 
+        "expiration_date": this.state.expiration_date
+    })
+    .then(() => {
+        this.componentDidMount();
+    })
+    .catch(function (error) {
+        console.log('err:',error);
+    });
+}else{
+    console.log('entrou no else', id)
+    axios.put(`http://192.168.0.21:5000/users/${id}`, 
     {
         "email": this.state.email, 
         "expiration_date": this.state.expiration_date
@@ -82,19 +91,21 @@ getone(id){
         console.log(res.data)
         this.setState({
             email:res.data.email,
-            expiration_date:res.data.expiration_date
+            expiration_date:res.data.expiration_date,
+            id: res.data.id
         })
     })
 }
 
 render(){
+    console.log('render:' ,this.state.id, this.state.email)
   return (
     <div className="container mt-5">
         <div className="row mt-5">
             <div className="col lg-6 mt-5">
                 <form onSubmit={(e)=>{this.submit(e,this.state.id)}}>
                     <div className="form-group">
-                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder="E-mail" value={this.state.email} />
+                        <input type="email" onChange={(e)=>{this.emailchange(e)}}className="form-control mt-2" placeholder="E-mail" value={this.state.email}/>
                     </div>
                     <div className="form-group">
                         <input type="date" onChange={(e)=>{this.datechange(e)}}className="form-control mt-2" placeholder="Data de expiração" value={this.state.expiration_date}/>

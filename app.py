@@ -16,9 +16,6 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 api = Api(app)
 jwt = JWTManager(app)
 
-# @app.route('/login')
-# def login():
-#     return render_template('login.html')
 
 @app.before_first_request
 def create_db():

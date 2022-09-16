@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import axios from "axios";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -10,18 +11,24 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: { 
-          email: email,
+          login: email,
           password: password
         }
       };
   
-      const response = await fetch("/api/token", requestOptions);
-      const data = await response.json();
-  
-      if (!response.ok) {
-        setErrorMessage(data.detail);
-      } else {
+      const response = await axios.post("http://192.168.0.21:5000/login", 
+      { 
+        login: email,
+        password: password
+      }).catch(function (error) {
+        console.log('err:', error)
+        });
+      if (response.status === 200) {
+        console.log('token', response.data)
         // setToken(data.access_token);
+      } else {
+        console.log('error')
+        // setErrorMessage(data.detail);
       }
     };
   
@@ -38,7 +45,7 @@ const Login = () => {
             <label className="label">Usuário</label>
             <div className="control">
               <input
-                type="email"
+                type="text"
                 placeholder="Usuário"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

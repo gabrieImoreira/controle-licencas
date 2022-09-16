@@ -1,13 +1,16 @@
 import React from "react";
 import axios from "axios";
 import { Alert } from 'reactstrap'
+import Login from "./components/Login";
 
+const token = '';
 // axios.defaults.withCredentials = true;
 class App extends React.Component {
 
-
+    
     constructor(props) {
         super(props);
+        const token = '';
         this.state =
         {
             users: [],
@@ -122,8 +125,9 @@ class App extends React.Component {
         return (
 
             <div className="container mt-5">
-
+                 {!token ? ( <Login />) : ( 
                 <div className="row mt-5">
+                   
                     <div className="mt-2">
                         {
                             this.state.message.text !== '' ? (
@@ -177,6 +181,7 @@ class App extends React.Component {
 
 
                 </div>
+                )}
             </div>
         );
     }

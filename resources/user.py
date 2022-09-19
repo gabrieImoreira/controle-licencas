@@ -31,7 +31,7 @@ class Inicial(Resource):
         return 'API Titanium.'
 
 class Users(Resource):
-    # @jwt_required()
+    @jwt_required()
     def get(self):
         connection = sqlite3.connect('database.db')
         cursor = connection.cursor()
@@ -61,7 +61,7 @@ class Users(Resource):
             })
         return {'users': users}
 
-    #@jwt_required()
+    @jwt_required()
     def post(self):
         data = User.attr.parse_args()
         try:
@@ -83,14 +83,14 @@ class User(Resource):
     attr.add_argument('email', type=str, required=True, help="The field 'email' cannot be left blank.")
     attr.add_argument('expiration_date', type=str, required=True, help="The field 'expiration_date' cannot be left blank.")
     
-    # @jwt_required()
+    @jwt_required()
     def get(self, id):
         user = UserModel.find_user(id)
         if user:
             return user.json()
         return {'message': 'User not found.'}, 404
 
-    # @jwt_required()
+    @jwt_required()
     def put(self, id):
         data = User.attr.parse_args()
         try:
@@ -110,7 +110,7 @@ class User(Resource):
             return user.json(), 200
         return {'message': 'User not found.'}, 404
     
-    # @jwt_required()
+    @jwt_required()
     def delete(self, id):
         user = UserModel.find_user(id)
         if user:

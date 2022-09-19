@@ -5,85 +5,6 @@ import useForceUpdate from 'use-force-update';
 var token = '';
 var first_time = 0
 
-// var Login = () => {
-//     const [email, setEmail] = useState("");
-//     const [password, setPassword] = useState("");
-//     var [token,] = useState("");
-    
-//     const submitLogin = (async () => {
-//       const requestOptions = {
-//         method: "POST",
-//         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-//         body: { 
-//           login: email,
-//           password: password
-//         }
-//       };
-  
-//       const response = await axios.post("http://192.168.0.21:5000/login", 
-//       { 
-//         login: email,
-//         password: password
-//       }).catch(function (error) {
-//         console.log('err:', error)
-//         });
-//       if (response.status === 200) {
-//         token = response.data.access_token;
-//       } else {
-//         console.log('error')
-//       }
-//       console.log('value', token)
-
-//       return token
-//     });
-
-//     const handleSubmit = (e) => {
-//       e.preventDefault();
-//       submitLogin();
-//     };
-    
-//     return (
-        
-//       <div className="container">
-//         <form className="box text-center" onSubmit={handleSubmit}>
-//           <h3 className="title text-center">Login</h3>
-//           <div className="field text-center mt-2">
-//             <label className="label">Usuário</label>
-//             <div className="control">
-//               <input
-//                 type="text"
-//                 placeholder="Usuário"
-//                 value={email}
-//                 onChange={(e) => setEmail(e.target.value)}
-//                 className="input"
-//                 required
-//               />
-//             </div>
-//           </div>
-//           <div className="field text-center mt-2">
-//             <label className="label">Senha</label>
-//             <div className="control">
-//               <input
-//                 type="password"
-//                 placeholder="Senha"
-//                 value={password}
-//                 onChange={(e) => setPassword(e.target.value)}
-//                 className="input"
-//                 required
-//               />
-//             </div>
-//           </div>
-//           {/* <ErrorMessage message={errorMessage} /> */}
-//           <br />
-//           <button className="button is-primary" type="submit">
-//             Login
-//           </button>
-//         </form>
-//       </div>
-//     );
-//   };
-
-// axios.defaults.withCredentials = true;
 class App extends React.Component {
 
     
@@ -104,12 +25,12 @@ class App extends React.Component {
             }
         }
     }
-    componentTeste(){
-        return 0
-    }
     componentDidMount() {
         if (this.state.token !== ''){
-        axios.get("http://192.168.0.21:5000/users")
+        const headers =  { 
+        "Content-Type": "application/x-www-form-urlencoded", 
+        "Authorization": this.state.token };
+        axios.get("http://192.168.0.21:5000/users", { headers })
             .then((res) =>
                 this.setState({
                     users: res.data.users,
@@ -134,19 +55,18 @@ class App extends React.Component {
     }
 
     submit(event, id) {
-        const headers = {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "*"
-        }
+        const headers =  { 
+            "Content-Type": "application/json", 
+            "Authorization": this.state.token };
         event.preventDefault()
+        console.log(headers)
         if (id === 0) {
             console.log('entrou no if', id)
                 axios.post('http://192.168.0.21:5000/users',
                 {
                     "email": this.state.email,
                     "expiration_date": this.state.expiration_date
-                })
+                }, {headers})
                 .then((response) => {
                     if (response.status === 200){
                         this.setState({
@@ -165,7 +85,7 @@ class App extends React.Component {
                 {
                     "email": this.state.email,
                     "expiration_date": this.state.expiration_date
-                })
+                }, { headers })
                 .then(() => {
                     this.setState({
                         message: {
@@ -181,7 +101,10 @@ class App extends React.Component {
     }
 
     delete(id) {
-        axios.delete(`http://192.168.0.21:5000/users/${id}`)
+        const headers =  { 
+            "Content-Type": "application/x-www-form-urlencoded", 
+            "Authorization": this.state.token };
+        axios.delete(`http://192.168.0.21:5000/users/${id}`, { headers })
             .then(() => {
                 this.setState({
                     message: {
@@ -193,7 +116,10 @@ class App extends React.Component {
     }
 
     getone(id) {
-        axios.get(`http://192.168.0.21:5000/users/${id}`)
+        const headers =  { 
+            "Content-Type": "application/x-www-form-urlencoded", 
+            "Authorization": this.state.token };
+        axios.get(`http://192.168.0.21:5000/users/${id}`, { headers })
             .then((res) => {
                 this.setState({
                     email: res.data.email,
@@ -216,14 +142,6 @@ class App extends React.Component {
     }
 
     submitLogin = () => {
-        const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: { 
-            login: this.state.email_login,
-            password: this.state.email_password
-          }
-        }
         const response = axios.post("http://192.168.0.21:5000/login", 
           { 
             login: this.state.email_login,
@@ -231,7 +149,7 @@ class App extends React.Component {
           })
           .then((response) => { 
             if (response.status === 200) {
-                this.state.token = response.data.access_token
+                this.state.token = 'Bearer ' + response.data.access_token
                 this.render()
             }
           })   
@@ -343,15 +261,14 @@ class App extends React.Component {
   
   
     </div>
-        
+        console.log(this.state.token)
         if (this.state.token === ''){
             var page = page_login
         } else {
             first_time = first_time + 1
             var page = page_users
-            if (first_time === 1){
-                console.log(first_time)
-            this.componentDidMount()
+            if (first_time <= 5){
+                this.componentDidMount()
             }
         }
 

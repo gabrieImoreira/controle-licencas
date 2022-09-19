@@ -10,14 +10,14 @@ from passlib.hash import bcrypt
 class Admin(Resource):
     hasher = bcrypt.using(rounds=13)
     # admin/{id}
-    # @jwt_required()
+    @jwt_required()
     def get(self, id):
         admin = AdminModel.find_admin(id)
         if admin:
             return admin.json()
         return {'message': 'Admin not found.'}, 404
     
-    # @jwt_required()
+    @jwt_required()
     def delete(self, id):
         admin = AdminModel.find_admin(id)
         if admin:
@@ -35,7 +35,7 @@ class AdminRegister(Resource):
     attr.add_argument('login', type=str, required=True, help="The field 'login' cannot be left blank.")
     attr.add_argument('password', type=str, required=True, help="The field 'password' cannot be left blank.")
     
-    # @jwt_required()
+    @jwt_required()
     def post(self):
         self.attr.add_argument('authorization', type=str, required=False, help="The field 'authorization' cannot be left blank.")
         data = self.attr.parse_args()

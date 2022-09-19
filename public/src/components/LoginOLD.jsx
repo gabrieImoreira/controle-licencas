@@ -1,12 +1,13 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
+var [token] = ''
 
 const Login = () => {
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
-  
-    const submitLogin = async () => {
+    
+    const submitLogin = (async () => {
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -24,20 +25,22 @@ const Login = () => {
         console.log('err:', error)
         });
       if (response.status === 200) {
-        console.log('token', response.data)
-        // setToken(data.access_token);
+        token = response.data.access_token;
       } else {
         console.log('error')
         // setErrorMessage(data.detail);
       }
-    };
-  
+      access_token = token
+      console.log(access_token)
+    });
+
     const handleSubmit = (e) => {
       e.preventDefault();
       submitLogin();
     };
-  
+    
     return (
+        
       <div className="container">
         <form className="box text-center" onSubmit={handleSubmit}>
           <h3 className="title text-center">Login</h3>
@@ -76,5 +79,5 @@ const Login = () => {
       </div>
     );
   };
-  
+  export var access_token = token
   export default Login;

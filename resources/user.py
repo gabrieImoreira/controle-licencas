@@ -9,7 +9,7 @@ from models.user import UserModel
 def normalize_path_params(email=None,
                         initial_date='01-01-1900',
                         final_date='3000-01-01',
-                        limit = 50,
+                        limit = 1000,
                         offset = 0, **data):
     if email:
         return { 
